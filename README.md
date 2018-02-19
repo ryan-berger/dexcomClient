@@ -11,5 +11,5 @@ hear about your projects if you use this API, so feel free to contact me if you 
 
 ### Contribution:
 Feel free to shoot me a pull request if you would like to help. I have been doing Go for less
-than a year now, so if yo would like to help me out by cleaning up the project structure, or adding
+than a year now, so if you would like to help me out by cleaning up the project structure, or adding
 better error handling, GO ahead!
