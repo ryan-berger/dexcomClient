@@ -1,9 +1,9 @@
 package dexcomClient
 
 import (
+	"context"
 	"fmt"
 	"net/http"
-	"context"
 
 	"github.com/gorilla/mux"
 )
@@ -17,12 +17,11 @@ type DexcomClient struct {
 
 func NewClient(client *http.Client, config *Config) *DexcomClient {
 	dc := &DexcomClient{
-		Client:     client,
-		Config:     config,
-		AuthClient: NewAuthClient(client, config),
-		EstimatedGlucoseClient:  NewEGVClient(config, &defaultLogger{config: config}),
+		Client:                 client,
+		Config:                 config,
+		AuthClient:             NewAuthClient(client, config),
+		EstimatedGlucoseClient: NewEGVClient(config, &defaultLogger{config: config}),
 	}
-
 
 	if config.IsDev {
 		fmt.Println("Dev server starting on :8000")
@@ -35,10 +34,10 @@ func NewClient(client *http.Client, config *Config) *DexcomClient {
 func NewClientWithAuthCode(client *http.Client, config *Config, authCode string) *DexcomClient {
 	config.AuthCode = authCode
 	return &DexcomClient{
-		Client:     client,
-		Config:     config,
-		AuthClient: NewAuthClient(client, config),
-		EstimatedGlucoseClient:  NewEGVClient(config, &defaultLogger{config: config}),
+		Client:                 client,
+		Config:                 config,
+		AuthClient:             NewAuthClient(client, config),
+		EstimatedGlucoseClient: NewEGVClient(config, &defaultLogger{config: config}),
 	}
 }
 

@@ -2,18 +2,18 @@ package dexcomClient
 
 import (
 	"bytes"
-	"io/ioutil"
-	"strings"
-	"net/http"
 	"encoding/json"
 	"errors"
+	"io/ioutil"
+	"net/http"
+	"strings"
 )
 
 const (
-	APPLICATIONID    = "d89443d2-327c-4a6f-89e5-496bbb0317db"
-	AGENT            = "Dexcom Share/3.0.2.11 CFNetwork/711.2.23 Darwin/14.0.0"
-	LOGINURL         = "https://share1.dexcom.com/ShareWebServices/Services/General/LoginPublisherAccountByName"
-	LATESTGLUCOSEURL = "https://share1.dexcom.com/ShareWebServices/Services/Publisher/ReadPublisherLatestGlucoseValues"
+	applicationId    = "d89443d2-327c-4a6f-89e5-496bbb0317db"
+	agent            = "Dexcom Share/3.0.2.11 CFNetwork/711.2.23 Darwin/14.0.0"
+	loginUrl         = "https://share1.dexcom.com/ShareWebServices/Services/General/LoginPublisherAccountByName"
+	latestGlucoseUrl = "https://share1.dexcom.com/ShareWebServices/Services/Publisher/ReadPublisherLatestGlucoseValues"
 )
 
 type AuthClient struct {
@@ -26,19 +26,19 @@ func NewAuthClient(httpClient *http.Client, config *Config) *AuthClient {
 }
 
 func (client *AuthClient) getLatestGlucoseUrl() string {
-	return LATESTGLUCOSEURL + "?sessionID=" + client.DexcomToken + "&minutes=1440&maxCount=1"
+	return latestGlucoseUrl + "?sessionID=" + client.DexcomToken + "&minutes=1440&maxCount=1"
 }
 
 func (client *AuthClient) GetSessionID(username, password string) (string, error) {
 	payload := map[string]string{
 		"accountName":   username,
 		"password":      password,
-		"applicationId": APPLICATIONID,
+		"applicationId": applicationId,
 	}
 	payloadBytes, _ := json.Marshal(&payload)
 	payloadReader := bytes.NewReader(payloadBytes)
-	req, _ := http.NewRequest("POST", LOGINURL, payloadReader)
-	req.Header.Add("user-agent", AGENT)
+	req, _ := http.NewRequest("POST", loginUrl, payloadReader)
+	req.Header.Add("user-agent", agent)
 	req.Header.Add("content-type", "application/json")
 	req.Header.Add("accept", "application/json")
 	resp, err := client.Do(req)
@@ -63,8 +63,9 @@ func (client *AuthClient) GetSessionID(username, password string) (string, error
 
 func (client *AuthClient) GetRealTimeData() (*RealTimeData, error) {
 	url := client.getLatestGlucoseUrl()
+
 	req, _ := http.NewRequest("POST", url, strings.NewReader(""))
-	req.Header.Add("user-agent", AGENT)
+	req.Header.Add("user-agent", agent)
 	req.Header.Add("content-type", "application/json")
 	req.Header.Add("accept", "application/json")
 	resp, err := client.Do(req)

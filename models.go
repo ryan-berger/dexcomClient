@@ -1,6 +1,5 @@
 package dexcomClient
 
-
 type Event struct {
 	SystemTime   string `json:"systemTime"`
 	DisplayTime  string `json:"displayTime"`
@@ -14,10 +13,9 @@ type EventResponse struct {
 	Events []Event `json:"events"`
 }
 
-
 type EGVResponse struct {
-	Unit  string              `json:"unit"`
-	Rate  string              `json:"rate"`
+	Unit  string `json:"unit"`
+	Rate  string `json:"rate"`
 	index int
 	EGVS  []*EGV `json:"egvs"`
 }
@@ -32,16 +30,16 @@ type EGV struct {
 }
 
 type Login struct {
-	AccountName string
-	Password string
+	AccountName   string
+	Password      string
 	ApplicationId string
 }
 
 type RealTimeData struct {
 	DeviceTime string `json:"DT"`
 	ServerTime string `json:"ST"`
-	Trend int
-	Value int
+	Trend      int
+	Value      int
 }
 
 type Device struct {

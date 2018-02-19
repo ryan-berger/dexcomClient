@@ -1,8 +1,8 @@
 package dexcomClient
 
 import (
-	"io/ioutil"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 )
 

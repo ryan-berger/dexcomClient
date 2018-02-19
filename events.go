@@ -1,20 +1,18 @@
 package dexcomClient
 
 import (
-	"net/http"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"encoding/json"
+	"net/http"
 )
 
-var EVENTS_URL = "v1/users/self/events"
-
-
+const eventsUrl = "v1/users/self/events"
 
 func GetEvents(token string, c *Config) []Event {
 	req, _ := http.NewRequest("GET",
-		UrlWithDateRange(c, EVENTS_URL, "2015-09-19T00:00:00", "2015-11-10T00:00:00"), nil)
-	req.Header.Add("authorization", "Bearer " + token)
+		UrlWithDateRange(c, eventsUrl, "2015-09-19T00:00:00", "2015-11-10T00:00:00"), nil)
+	req.Header.Add("authorization", "Bearer "+token)
 	resp, err := http.DefaultClient.Do(req)
 
 	if err != nil {

@@ -1,15 +1,15 @@
 package dexcomClient
 
 import (
-	"io/ioutil"
-	"fmt"
-	"strconv"
-	"sort"
-	"net/http"
-	"errors"
 	"encoding/json"
-	"time"
+	"errors"
+	"fmt"
+	"io/ioutil"
 	"math"
+	"net/http"
+	"sort"
+	"strconv"
+	"time"
 )
 
 type rangeRequest struct {
@@ -22,9 +22,7 @@ type EstimatedGlucoseClient struct {
 	Logger
 }
 
-
-const EGV_URL = "/v1/users/self/egvs"
-const formatString = "2006-01-02"
+const egvUrl = "/v1/users/self/egvs"
 const dateTimeString = "2006-01-02T15:04:05"
 
 // turns days into nanoseconds
@@ -34,15 +32,14 @@ func daysDuration(days int) time.Duration {
 
 type Range struct {
 	StartDate string
-	EndDate string
+	EndDate   string
 }
 
 // Get ranges inclusively given a start and end date
-func GetEGVRanges(start string, end string) []*Range  {
+func GetEGVRanges(start string, end string) []*Range {
 	// Parse dates
 	startDate, _ := time.Parse(dateTimeString, start)
 	endDate, _ := time.Parse(dateTimeString, end)
-
 
 	endUTC := endDate.UTC()
 
@@ -60,7 +57,7 @@ func GetEGVRanges(start string, end string) []*Range  {
 		var requestEndDay time.Time
 
 		// Start date is 90 * 2i
-		requestStartDay := startDate.Add(daysDuration(90 * i + i))
+		requestStartDay := startDate.Add(daysDuration(90*i + i))
 		if i == monthDistance {
 			// If we are at the end of the list,
 			// don't use the diff formula because then we could
@@ -69,16 +66,13 @@ func GetEGVRanges(start string, end string) []*Range  {
 		} else {
 			// End date is (90 * 2i) + 90
 			// so that we are 90 days ahead of the start date
-			requestEndDay = startDate.Add(daysDuration((90 * i + i) + 90))
+			requestEndDay = startDate.Add(daysDuration((90*i + i) + 90))
 		}
 		ranges = append(ranges,
 			&Range{StartDate: requestStartDay.Format(dateTimeString), EndDate: requestEndDay.Format(dateTimeString)})
 	}
 	return ranges
 }
-
-
-
 
 func NewEGVClient(config *Config, logger Logger) *EstimatedGlucoseClient {
 	return &EstimatedGlucoseClient{Config: config, Logger: logger}
@@ -104,11 +98,11 @@ func (client *EstimatedGlucoseClient) GetEGVs(startDate string, endDate string) 
 	// catch all of the requests. There should only be
 	// len(ranges) so we can just wait for all of those
 	// to finish
-	for i, j := 0, len(ranges); i < j; i++{
+	for i, j := 0, len(ranges); i < j; i++ {
 		select {
-		case response := <- egvChan:
+		case response := <-egvChan:
 			responses = append(responses, response)
-		case reqErr := <- errChan:
+		case reqErr := <-errChan:
 			errorList = append(errorList, reqErr)
 		}
 	}
@@ -126,12 +120,12 @@ func (client *EstimatedGlucoseClient) GetEGVs(startDate string, endDate string) 
 	return egvResponses, errorList
 }
 
-func (client *EstimatedGlucoseClient) getRange(request rangeRequest, resultChan chan *EGVResponse, errChan chan error)  {
+func (client *EstimatedGlucoseClient) getRange(request rangeRequest, resultChan chan *EGVResponse, errChan chan error) {
 	// Make request with url date range
 	req, _ := http.NewRequest("GET",
-		UrlWithDateRange(client.Config, EGV_URL, request.StartDate, request.EndDate), nil)
+		UrlWithDateRange(client.Config, egvUrl, request.StartDate, request.EndDate), nil)
 
-	client.Debug("URL: " + UrlWithDateRange(client.Config, EGV_URL, request.StartDate, request.EndDate))
+	client.Debug("URL: " + UrlWithDateRange(client.Config, egvUrl, request.StartDate, request.EndDate))
 
 	token, err := client.GetOauthToken()
 
@@ -140,7 +134,7 @@ func (client *EstimatedGlucoseClient) getRange(request rangeRequest, resultChan 
 		return
 	}
 
-	req.Header.Add("Authorization", "Bearer " + token.AccessToken)
+	req.Header.Add("Authorization", "Bearer "+token.AccessToken)
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		errChan <- err

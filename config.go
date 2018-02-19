@@ -1,15 +1,17 @@
 package dexcomClient
 
 import (
+	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"strings"
-	"encoding/json"
 )
 
-const BASE_URL = "https://api.dexcom.com"
-const DEV_URL = "https://sandbox-api.dexcom.com"
-const AUTH_URL = "/v1/oauth2/token"
+const (
+	baseUrl = "https://api.dexcom.com"
+	devUrl  = "https://sandbox-api.dexcom.com"
+	authUrl = "/v1/oauth2/token"
+)
 
 type Config struct {
 	ClientId     string
@@ -51,13 +53,13 @@ func (c *Config) SetOAuthToken(token *Token) {
 
 func (c *Config) GetBaseUrl() string {
 	if c.Sandbox {
-		return DEV_URL
+		return devUrl
 	}
-	return BASE_URL
+	return baseUrl
 }
 
 func (c *Config) authenticate() (*Token, error) {
-	req, _ := http.NewRequest("POST", c.GetBaseUrl()+AUTH_URL, c.getAuthPayload())
+	req, _ := http.NewRequest("POST", c.GetBaseUrl()+authUrl, c.getAuthPayload())
 	req.Header.Add("content-type", "application/x-www-form-urlencoded")
 	req.Header.Add("cache", "no-cache")
 	resp, err := http.DefaultClient.Do(req)
