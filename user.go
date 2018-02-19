@@ -28,7 +28,7 @@ func (client *AuthClient) getLatestGlucoseUrl() string {
 	return latestGlucoseUrl + "?sessionID=" + client.config.DexcomToken + "&minutes=1440&maxCount=1"
 }
 
-func (client *AuthClient) GetSessionID(username, password string) (string, error) {
+func (client *AuthClient) GetSessionID(username, password string) error {
 	payload := map[string]string{
 		"accountName":   username,
 		"password":      password,
@@ -43,7 +43,7 @@ func (client *AuthClient) GetSessionID(username, password string) (string, error
 	resp, err := http.DefaultClient.Do(req)
 
 	if err != nil {
-		return "", err
+		return err
 	}
 
 	sessionId, _ := ioutil.ReadAll(resp.Body)
@@ -57,7 +57,7 @@ func (client *AuthClient) GetSessionID(username, password string) (string, error
 	}
 
 	client.config.DexcomToken = string(id)
-	return string(id), nil
+	return nil
 }
 
 func (client *AuthClient) GetRealTimeData() (*RealTimeData, error) {
