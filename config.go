@@ -51,7 +51,7 @@ func (c *Config) SetOAuthToken(token *Token) {
 	c.oAuthToken = token
 }
 
-func (c *Config) GetBaseUrl() string {
+func (c *Config) getBaseUrl() string {
 	if c.Sandbox {
 		return devUrl
 	}
@@ -59,7 +59,7 @@ func (c *Config) GetBaseUrl() string {
 }
 
 func (c *Config) authenticate() (*Token, error) {
-	req, _ := http.NewRequest("POST", c.GetBaseUrl()+authUrl, c.getAuthPayload())
+	req, _ := http.NewRequest("POST", c.getBaseUrl()+authUrl, c.getAuthPayload())
 	req.Header.Add("content-type", "application/x-www-form-urlencoded")
 	req.Header.Add("cache", "no-cache")
 	resp, err := http.DefaultClient.Do(req)

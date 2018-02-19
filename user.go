@@ -17,16 +17,15 @@ const (
 )
 
 type AuthClient struct {
-	*http.Client
-	*Config
+	config *Config
 }
 
-func NewAuthClient(httpClient *http.Client, config *Config) *AuthClient {
-	return &AuthClient{Client: httpClient, Config: config}
+func NewAuthClient(config *Config) *AuthClient {
+	return &AuthClient{config: config}
 }
 
 func (client *AuthClient) getLatestGlucoseUrl() string {
-	return latestGlucoseUrl + "?sessionID=" + client.DexcomToken + "&minutes=1440&maxCount=1"
+	return latestGlucoseUrl + "?sessionID=" + client.config.DexcomToken + "&minutes=1440&maxCount=1"
 }
 
 func (client *AuthClient) GetSessionID(username, password string) (string, error) {
@@ -41,7 +40,7 @@ func (client *AuthClient) GetSessionID(username, password string) (string, error
 	req.Header.Add("user-agent", agent)
 	req.Header.Add("content-type", "application/json")
 	req.Header.Add("accept", "application/json")
-	resp, err := client.Do(req)
+	resp, err := http.DefaultClient.Do(req)
 
 	if err != nil {
 		return "", err
@@ -57,7 +56,7 @@ func (client *AuthClient) GetSessionID(username, password string) (string, error
 		}
 	}
 
-	client.DexcomToken = string(id)
+	client.config.DexcomToken = string(id)
 	return string(id), nil
 }
 
@@ -68,7 +67,7 @@ func (client *AuthClient) GetRealTimeData() (*RealTimeData, error) {
 	req.Header.Add("user-agent", agent)
 	req.Header.Add("content-type", "application/json")
 	req.Header.Add("accept", "application/json")
-	resp, err := client.Do(req)
+	resp, err := http.DefaultClient.Do(req)
 
 	if err != nil {
 		return nil, err
