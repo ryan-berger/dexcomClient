@@ -22,8 +22,8 @@ type Config struct {
 	Logging      bool
 	AuthCode     string
 	RedirectURI  string
-	oAuthToken   *Token
 	DexcomToken  string
+	oAuthToken   *Token
 }
 
 type Token struct {

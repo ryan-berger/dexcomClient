@@ -36,7 +36,7 @@ type Range struct {
 }
 
 // Get ranges inclusively given a start and end date
-func GetEGVRanges(start string, end string) []*Range {
+func getEGVRanges(start string, end string) []*Range {
 	// Parse dates
 	startDate, _ := time.Parse(dateTimeString, start)
 	endDate, _ := time.Parse(dateTimeString, end)
