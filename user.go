@@ -84,7 +84,3 @@ func (client *AuthClient) GetRealTimeData() (*RealTimeData, error) {
 	}
 	return &realTimeData[0], nil
 }
-
-func (client *AuthClient) Authenticate() (*Token, error) {
-	return client.GetOauthToken()
-}

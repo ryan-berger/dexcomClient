@@ -123,9 +123,9 @@ func (client *EstimatedGlucoseClient) GetEGVs(startDate string, endDate string) 
 func (client *EstimatedGlucoseClient) getRange(request rangeRequest, resultChan chan *EGVResponse, errChan chan error) {
 	// Make request with url date range
 	req, _ := http.NewRequest("GET",
-		UrlWithDateRange(client.Config, egvUrl, request.StartDate, request.EndDate), nil)
+		urlWithDateRange(client.Config, egvUrl, request.StartDate, request.EndDate), nil)
 
-	client.Debug("URL: " + UrlWithDateRange(client.Config, egvUrl, request.StartDate, request.EndDate))
+	client.Debug("URL: " + urlWithDateRange(client.Config, egvUrl, request.StartDate, request.EndDate))
 
 	token, err := client.GetOauthToken()
 

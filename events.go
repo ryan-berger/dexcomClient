@@ -11,7 +11,7 @@ const eventsUrl = "v1/users/self/events"
 
 func GetEvents(token string, c *Config) []Event {
 	req, _ := http.NewRequest("GET",
-		UrlWithDateRange(c, eventsUrl, "2015-09-19T00:00:00", "2015-11-10T00:00:00"), nil)
+		urlWithDateRange(c, eventsUrl, "2015-09-19T00:00:00", "2015-11-10T00:00:00"), nil)
 	req.Header.Add("authorization", "Bearer "+token)
 	resp, err := http.DefaultClient.Do(req)
 

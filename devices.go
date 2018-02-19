@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-func GetData() {
+func getData() {
 	url := "https://sandbox-api.dexcom.com/v1/users/self/devices"
 	req, _ := http.NewRequest("GET", url, nil)
 	req.Header.Add("authorization", "Bearer ")
