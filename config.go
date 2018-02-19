@@ -56,7 +56,7 @@ func (c *Config) getBaseUrl() string {
 }
 
 func (client *DexcomClient) authenticate() (*Token, error) {
-	req, _ := http.NewRequest("POST", c.getBaseUrl()+authUrl, c.getAuthPayload())
+	req, _ := http.NewRequest("POST", client.config.getBaseUrl()+authUrl, client.getAuthPayload())
 	req.Header.Add("content-type", "application/x-www-form-urlencoded")
 	req.Header.Add("cache", "no-cache")
 	resp, err := http.DefaultClient.Do(req)
