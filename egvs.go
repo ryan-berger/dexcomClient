@@ -15,9 +15,20 @@ import (
 const egvUrl = "/v1/users/self/egvs"
 const dateTimeString = "2006-01-02T15:04:05"
 
-type EstimatedGlucoseClient struct {
-	config *Config
-	Logger
+type EGVResponse struct {
+	Unit  string `json:"unit"`
+	Rate  string `json:"rate"`
+	index int
+	EGVS  []*EGV `json:"egvs"`
+}
+
+type EGV struct {
+	SystemTime  string
+	DisplayTime string
+	Value       uint64
+	Status      string
+	Trend       string
+	TrendRate   float64
 }
 
 type Range struct {
@@ -25,11 +36,7 @@ type Range struct {
 	EndDate   string
 }
 
-func NewEGVClient(config *Config, logger Logger) *EstimatedGlucoseClient {
-	return &EstimatedGlucoseClient{config: config, Logger: logger}
-}
-
-func (client *EstimatedGlucoseClient) GetEGVs(startDate string, endDate string) ([]*EGVResponse, error) {
+func (client *DexcomClient) GetEGVs(startDate string, endDate string) ([]*EGVResponse, error) {
 	ranges := getEGVRanges(startDate, endDate)
 
 	// egv channel to allow for concurrency in the requests
@@ -68,14 +75,14 @@ func (client *EstimatedGlucoseClient) GetEGVs(startDate string, endDate string) 
 	return egvResponses, nil
 }
 
-func (client *EstimatedGlucoseClient) getRange(request rangeRequest, resultChan chan *EGVResponse, errChan chan error) {
+func (client *DexcomClient) getRange(request rangeRequest, resultChan chan *EGVResponse, errChan chan error) {
 	// Make request with url date range
 	req, _ := http.NewRequest("GET",
 		urlWithDateRange(client.config, egvUrl, request.StartDate, request.EndDate), nil)
 
 	client.Debug("URL: " + urlWithDateRange(client.config, egvUrl, request.StartDate, request.EndDate))
 
-	token, err := client.config.GetOauthToken()
+	token, err := client.GetOauthToken()
 
 	if err != nil {
 		errChan <- err

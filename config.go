@@ -20,10 +20,7 @@ type Config struct {
 	Sandbox      bool
 	IsDebug      bool
 	Logging      bool
-	AuthCode     string
 	RedirectURI  string
-	DexcomToken  string
-	oAuthToken   *Token
 }
 
 type Token struct {
@@ -34,21 +31,21 @@ type Token struct {
 	TimeRefreshed int
 }
 
-func (c *Config) GetOauthToken() (*Token, error) {
-	if c.oAuthToken != nil {
-		return c.oAuthToken, nil
+func (client *DexcomClient) GetOauthToken() (*Token, error) {
+	if client.oAuthToken != nil {
+		return client.oAuthToken, nil
 	}
 
-	token, err := c.authenticate()
+	token, err := client.authenticate()
 	if err != nil {
 		return nil, err
 	}
-	c.oAuthToken = token
+	client.oAuthToken = token
 	return token, err
 }
 
-func (c *Config) SetOAuthToken(token *Token) {
-	c.oAuthToken = token
+func (client *DexcomClient) SetOAuthToken(token *Token) {
+	client.oAuthToken = token
 }
 
 func (c *Config) getBaseUrl() string {
@@ -58,7 +55,7 @@ func (c *Config) getBaseUrl() string {
 	return baseUrl
 }
 
-func (c *Config) authenticate() (*Token, error) {
+func (client *DexcomClient) authenticate() (*Token, error) {
 	req, _ := http.NewRequest("POST", c.getBaseUrl()+authUrl, c.getAuthPayload())
 	req.Header.Add("content-type", "application/x-www-form-urlencoded")
 	req.Header.Add("cache", "no-cache")
@@ -74,11 +71,11 @@ func (c *Config) authenticate() (*Token, error) {
 	return &token, nil
 }
 
-func (c *Config) getAuthPayload() *strings.Reader {
-	clientSecret := "client_secret=" + c.ClientSecret + "&"
-	clientId := "client_id=" + c.ClientId + "&"
-	code := "code=" + c.AuthCode + "&"
-	redirectUri := "redirect_uri=" + c.RedirectURI
+func (client *DexcomClient) getAuthPayload() *strings.Reader {
+	clientSecret := "client_secret=" + client.config.ClientSecret + "&"
+	clientId := "client_id=" + client.config.ClientId + "&"
+	code := "code=" + client.AuthCode + "&"
+	redirectUri := "redirect_uri=" + client.config.RedirectURI
 	b := clientSecret + clientId + code + "grant_type=authorization_code&" + redirectUri
 	return strings.NewReader(b)
 }

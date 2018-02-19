@@ -9,16 +9,16 @@ import (
 )
 
 type DexcomClient struct {
-	config *Config
-	*AuthClient
-	*EstimatedGlucoseClient
+	Logger
+	AuthCode    string
+	DexcomToken string
+	config      *Config
+	oAuthToken  *Token
 }
 
 func NewClient(config *Config) *DexcomClient {
 	dc := &DexcomClient{
-		config:                 config,
-		AuthClient:             NewAuthClient(config),
-		EstimatedGlucoseClient: NewEGVClient(config, &defaultLogger{config: config}),
+		config: config,
 	}
 
 	if config.IsDev {
@@ -29,12 +29,10 @@ func NewClient(config *Config) *DexcomClient {
 	return dc
 }
 
-func NewClientWithToken(client *http.Client, config *Config, token *Token) *DexcomClient {
-	config.SetOAuthToken(token)
+func NewClientWithToken(config *Config, token *Token) *DexcomClient {
 	return &DexcomClient{
-		config:                 config,
-		AuthClient:             NewAuthClient(config),
-		EstimatedGlucoseClient: NewEGVClient(config, &defaultLogger{config: config}),
+		config:     config,
+		oAuthToken: token,
 	}
 }
 
@@ -43,8 +41,8 @@ func (client *DexcomClient) startDevServer() {
 
 	router := mux.NewRouter()
 	router.Path("/oauth").Queries("code", "{code}").HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-		client.config.AuthCode = req.FormValue("code")
-		_, err := client.config.GetOauthToken()
+		client.AuthCode = req.FormValue("code")
+		_, err := client.GetOauthToken()
 		if err != nil {
 			panic(err)
 		}

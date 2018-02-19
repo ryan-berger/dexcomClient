@@ -16,19 +16,20 @@ const (
 	latestGlucoseUrl = "https://share1.dexcom.com/ShareWebServices/Services/Publisher/ReadPublisherLatestGlucoseValues"
 )
 
-type AuthClient struct {
-	config *Config
+type RealTimeData struct {
+	DeviceTime string `json:"DT"`
+	ServerTime string `json:"ST"`
+	Trend      int
+	Value      int
 }
 
-func NewAuthClient(config *Config) *AuthClient {
-	return &AuthClient{config: config}
+func (client *DexcomClient) getLatestGlucoseUrl() string {
+	return latestGlucoseUrl + "?sessionID=" + client.DexcomToken + "&minutes=1440&maxCount=1"
 }
 
-func (client *AuthClient) getLatestGlucoseUrl() string {
-	return latestGlucoseUrl + "?sessionID=" + client.config.DexcomToken + "&minutes=1440&maxCount=1"
-}
 
-func (client *AuthClient) GetSessionID(username, password string) error {
+
+func (client *DexcomClient) GetSessionID(username, password string) error {
 	payload := map[string]string{
 		"accountName":   username,
 		"password":      password,
@@ -56,11 +57,11 @@ func (client *AuthClient) GetSessionID(username, password string) error {
 		}
 	}
 
-	client.config.DexcomToken = string(id)
+	client.DexcomToken = string(id)
 	return nil
 }
 
-func (client *AuthClient) GetRealTimeData() (*RealTimeData, error) {
+func (client *DexcomClient) GetRealTimeData() (*RealTimeData, error) {
 	url := client.getLatestGlucoseUrl()
 
 	req, _ := http.NewRequest("POST", url, strings.NewReader(""))
