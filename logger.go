@@ -2,7 +2,7 @@ package dexcomClient
 
 import "fmt"
 
-type Logger interface {
+type logger interface {
 	Debug(string)
 	Dev(string)
 	Log(string)

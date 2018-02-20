@@ -9,11 +9,11 @@ import (
 )
 
 type DexcomClient struct {
-	Logger
 	AuthCode    string
 	DexcomToken string
 	config      *Config
 	oAuthToken  *Token
+	logger
 }
 
 func NewClient(config *Config) *DexcomClient {

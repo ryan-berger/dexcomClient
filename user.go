@@ -27,8 +27,6 @@ func (client *DexcomClient) getLatestGlucoseUrl() string {
 	return latestGlucoseUrl + "?sessionID=" + client.DexcomToken + "&minutes=1440&maxCount=1"
 }
 
-
-
 func (client *DexcomClient) GetSessionID(username, password string) error {
 	payload := map[string]string{
 		"accountName":   username,

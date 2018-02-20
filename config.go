@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"time"
 )
 
 const (
@@ -16,31 +17,38 @@ const (
 type Config struct {
 	ClientId     string
 	ClientSecret string
-	IsDev        bool
+	RedirectURI  string
 	Sandbox      bool
+	IsDev        bool
 	IsDebug      bool
 	Logging      bool
-	RedirectURI  string
 }
 
 type Token struct {
 	AccessToken   string `json:"access_token"`
-	ExpiresIn     uint64 `json:"expires_in"`
+	ExpiresIn     int64  `json:"expires_in"`
 	TokenType     string `json:"token_type"`
 	RefreshToken  string `json:"refresh_token"`
-	TimeRefreshed int
+	TimeRefreshed int64
 }
 
 func (client *DexcomClient) GetOauthToken() (*Token, error) {
+	expired := client.oAuthToken.TimeRefreshed + client.oAuthToken.ExpiresIn <= time.Now().Unix()
+
 	if client.oAuthToken != nil {
+		if expired {
+			goto REQUEST
+		}
 		return client.oAuthToken, nil
 	}
 
+	REQUEST:
 	token, err := client.authenticate()
 	if err != nil {
 		return nil, err
 	}
 	client.oAuthToken = token
+	token.TimeRefreshed = time.Now().Unix()
 	return token, err
 }
 
