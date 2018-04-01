@@ -48,7 +48,6 @@ func (client *DexcomClient) startDevServer(url string) {
 		if err != nil {
 			panic(err)
 		}
-		rw.WriteHeader(200)
 		server.Shutdown(context.Background())
 	})
 
