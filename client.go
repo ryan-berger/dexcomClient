@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"os/exec"
 )
 
 type DexcomClient struct {
@@ -24,7 +25,8 @@ func NewClient(config *Config) *DexcomClient {
 	if config.IsDev {
 		fmt.Println("Dev server starting on :8000")
 		fmt.Println(config.getBaseUrl() + "/v1/oauth2/login?client_id=" + config.ClientId + "&redirect_uri=" + config.RedirectURI + "&response_type=code&scope=offline_access")
-		defer dc.startDevServer()
+		url := config.getBaseUrl() + "/v1/oauth2/login?client_id=" + config.ClientId + "&redirect_uri=" + config.RedirectURI + "&response_type=code&scope=offline_access"
+		defer dc.startDevServer(url)
 	}
 	return dc
 }
@@ -36,7 +38,7 @@ func NewClientWithToken(config *Config, token *Token) *DexcomClient {
 	}
 }
 
-func (client *DexcomClient) startDevServer() {
+func (client *DexcomClient) startDevServer(url string) {
 	server := &http.Server{Addr: ":8000"}
 
 	router := mux.NewRouter()
@@ -46,9 +48,11 @@ func (client *DexcomClient) startDevServer() {
 		if err != nil {
 			panic(err)
 		}
+		rw.WriteHeader(200)
 		server.Shutdown(context.Background())
 	})
 
 	server.Handler = router
 	server.ListenAndServe()
+	exec.Command("open", url)
 }
