@@ -33,9 +33,9 @@ type Token struct {
 }
 
 func (client *DexcomClient) GetOauthToken() (*Token, error) {
-	expired := client.oAuthToken.TimeRefreshed + client.oAuthToken.ExpiresIn <= time.Now().Unix()
 
 	if client.oAuthToken != nil {
+		expired := client.oAuthToken.TimeRefreshed + client.oAuthToken.ExpiresIn <= time.Now().Unix()
 		if expired {
 			goto REQUEST
 		}
