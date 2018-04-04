@@ -20,6 +20,7 @@ type DexcomClient struct {
 func NewClient(config *Config) *DexcomClient {
 	dc := &DexcomClient{
 		config: config,
+		logger: &defaultLogger{config: config},
 	}
 
 	if config.IsDev {
@@ -34,6 +35,7 @@ func NewClientWithToken(config *Config, token *Token) *DexcomClient {
 	return &DexcomClient{
 		config:     config,
 		oAuthToken: token,
+		logger: &defaultLogger{config: config},
 	}
 }
 
