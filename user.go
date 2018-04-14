@@ -19,7 +19,7 @@ const (
 type RealTimeData struct {
 	DeviceTime string `json:"DT"`
 	ServerTime string `json:"ST"`
-	Trend      float64
+	Trend      int
 	Value      float64
 }
 
