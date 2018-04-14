@@ -90,8 +90,7 @@ func (client *DexcomClient) authenticate() (*Token, error) {
 	json.Unmarshal(body, &token)
 
 	if token.RefreshToken == "" {
-		fmt.Println(string(body))
-		return nil, errors.New("Whoopsy")
+		return nil, errors.New("auth error")
 	}
 
 	return &token, nil
