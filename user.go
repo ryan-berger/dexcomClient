@@ -19,8 +19,8 @@ const (
 type RealTimeData struct {
 	DeviceTime string `json:"DT"`
 	ServerTime string `json:"ST"`
-	Trend      int
-	Value      int
+	Trend      float64
+	Value      float64
 }
 
 func (client *DexcomClient) getLatestGlucoseUrl() string {
