@@ -52,6 +52,17 @@ func (client *DexcomClient) GetOauthToken() (*Token, error) {
 	return token, err
 }
 
+func (client *DexcomClient) GetOAuthTokenWithAuth(authorization string) (*Token, error) {
+	client.oAuthToken = &Token{}
+	token, err := client.authenticate()
+	if err != nil {
+		return nil, err
+	}
+	client.oAuthToken = token
+	token.TimeRefreshed = time.Now().Unix()
+	return token, err
+}
+
 func (client *DexcomClient) SetOAuthToken(token *Token) {
 	client.oAuthToken = token
 }
@@ -73,9 +84,14 @@ func (client *DexcomClient) authenticate() (*Token, error) {
 	}
 
 	body, _ := ioutil.ReadAll(resp.Body)
-
 	var token Token
 	json.Unmarshal(body, &token)
+
+	if token.RefreshToken == "" {
+		fmt.Println(string(body))
+		return nil, errors.New("Whoopsy")
+	}
+
 	return &token, nil
 }
 

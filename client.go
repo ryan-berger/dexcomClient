@@ -26,6 +26,7 @@ func NewClient(config *Config) *DexcomClient {
 	if config.IsDev {
 		fmt.Println("Dev server starting on :8000")
 		url := config.getBaseUrl() + "/v1/oauth2/login?client_id=" + config.ClientId + "&redirect_uri=" + config.RedirectURI + "&response_type=code&scope=offline_access"
+		fmt.Println(url)
 		defer dc.startDevServer(url)
 	}
 	return dc
