@@ -2,11 +2,11 @@ package dexcomClient
 
 import (
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"net/http"
 	"strings"
 	"time"
-	"errors"
 )
 
 const (

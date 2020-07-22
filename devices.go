@@ -1,9 +1,9 @@
 package dexcomClient
 
 import (
+	"encoding/json"
 	"io/ioutil"
 	"net/http"
-	"encoding/json"
 )
 
 type Device struct {

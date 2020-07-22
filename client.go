@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"os/exec"
 
 	"github.com/gorilla/mux"
-	"os/exec"
 )
 
 type DexcomClient struct {
@@ -36,7 +36,7 @@ func NewClientWithToken(config *Config, token *Token) *DexcomClient {
 	return &DexcomClient{
 		config:     config,
 		oAuthToken: token,
-		logger: &defaultLogger{config: config},
+		logger:     &defaultLogger{config: config},
 	}
 }
 
