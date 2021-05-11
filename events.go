@@ -2,7 +2,7 @@ package dexcomClient
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"fmt"
 	"net/http"
 )
 
@@ -21,28 +21,31 @@ type EventResponse struct {
 	Events []Event `json:"events"`
 }
 
-func (client *DexcomClient) GetEvents(startDate, endDate string) ([]Event, error) {
-	req, _ := http.NewRequest("GET",
+func (client *Client) GetEvents(startDate, endDate string) ([]Event, error) {
+	req, err := http.NewRequest("GET",
 		urlWithDateRange(client.config, eventsUrl, startDate, endDate), nil)
 
-	token, err := client.GetOauthToken()
 
 	if err != nil {
 		return nil, err
 	}
 
-	req.Header.Add("authorization", "Bearer " + token.AccessToken)
+	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", "asdf"))
 	resp, err := http.DefaultClient.Do(req)
 
 	if err != nil {
 		return nil, err
 	}
 
-	body, _ := ioutil.ReadAll(resp.Body)
-	defer resp.Body.Close()
 
 	var response EventResponse
-	json.Unmarshal(body, &response)
+	err = json.
+		NewDecoder(resp.Body).
+		Decode(&resp)
+
+	if err != nil {
+		return nil, err
+	}
 
 	return response.Events, nil
 }

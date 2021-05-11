@@ -23,11 +23,11 @@ type RealTimeData struct {
 	Value      float64
 }
 
-func (client *DexcomClient) getLatestGlucoseUrl() string {
+func (client *Client) getLatestGlucoseUrl() string {
 	return latestGlucoseUrl + "?sessionID=" + client.DexcomToken + "&minutes=1440&maxCount=1"
 }
 
-func (client *DexcomClient) GetSessionID(username, password string) error {
+func (client *Client) GetSessionID(username, password string) error {
 	payload := map[string]string{
 		"accountName":   username,
 		"password":      password,
@@ -59,7 +59,7 @@ func (client *DexcomClient) GetSessionID(username, password string) error {
 	return nil
 }
 
-func (client *DexcomClient) GetRealTimeData() (*RealTimeData, error) {
+func (client *Client) GetRealTimeData() (*RealTimeData, error) {
 	url := client.getLatestGlucoseUrl()
 
 	req, _ := http.NewRequest("POST", url, strings.NewReader(""))

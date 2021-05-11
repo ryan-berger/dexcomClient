@@ -36,7 +36,7 @@ type Range struct {
 	EndDate   string
 }
 
-func (client *DexcomClient) GetEGVs(startDate string, endDate string) ([]*EGVResponse, error) {
+func (client *Client) GetEGVs(startDate string, endDate string) ([]*EGVResponse, error) {
 	ranges := getEGVRanges(startDate, endDate)
 
 	// egv channel to allow for concurrency in the requests
@@ -75,21 +75,14 @@ func (client *DexcomClient) GetEGVs(startDate string, endDate string) ([]*EGVRes
 	return egvResponses, nil
 }
 
-func (client *DexcomClient) getRange(request rangeRequest, resultChan chan *EGVResponse, errChan chan error) {
+func (client *Client) getRange(request rangeRequest, resultChan chan *EGVResponse, errChan chan error) {
 	// Make request with url date range
 	req, _ := http.NewRequest("GET",
 		urlWithDateRange(client.config, egvUrl, request.StartDate, request.EndDate), nil)
 
 	client.Debug("URL: " + urlWithDateRange(client.config, egvUrl, request.StartDate, request.EndDate))
 
-	token, err := client.GetOauthToken()
 
-	if err != nil {
-		errChan <- err
-		return
-	}
-
-	req.Header.Add("Authorization", "Bearer "+token.AccessToken)
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		errChan <- err
@@ -117,7 +110,7 @@ func (client *DexcomClient) getRange(request rangeRequest, resultChan chan *EGVR
 }
 
 type rangeRequest struct {
-	*Range
+	Range
 	index int
 }
 
@@ -127,7 +120,7 @@ func daysDuration(days int) time.Duration {
 }
 
 // Get ranges inclusively given a start and end date
-func getEGVRanges(start string, end string) []*Range {
+func getEGVRanges(start string, end string) []Range {
 	// Parse dates
 	startDate, _ := time.Parse(dateTimeString, start)
 	endDate, _ := time.Parse(dateTimeString, end)
@@ -142,7 +135,7 @@ func getEGVRanges(start string, end string) []*Range {
 	// and subtract one because it may not be completely even
 	monthDistance := int(math.Floor(daysDiff / 90))
 
-	var ranges []*Range
+	var ranges []Range
 
 	for i := 0; i <= monthDistance; i++ {
 		var requestEndDay time.Time
@@ -160,7 +153,7 @@ func getEGVRanges(start string, end string) []*Range {
 			requestEndDay = startDate.Add(daysDuration((90*i + i) + 90))
 		}
 		ranges = append(ranges,
-			&Range{StartDate: requestStartDay.Format(dateTimeString), EndDate: requestEndDay.Format(dateTimeString)})
+			Range{StartDate: requestStartDay.Format(dateTimeString), EndDate: requestEndDay.Format(dateTimeString)})
 	}
 	return ranges
 }
