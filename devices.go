@@ -2,7 +2,7 @@ package dexcomClient
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"fmt"
 	"net/http"
 )
 
@@ -23,27 +23,29 @@ type AlertSetting struct {
 	DisplayTime string
 }
 
-func (client *DexcomClient) GetDevices() ([]*Device, error) {
-	url := client.config.getBaseUrl() + "/v1/users/self/devices"
-	req, _ := http.NewRequest("GET", url, nil)
+func (client *Client) GetDevices() ([]Device, error) {
+	url := fmt.Sprintf("%s/v1/users/self/devices", client.config.getBaseUrl())
+	req, err := http.NewRequest("GET", url, nil)
 
-	req.Header.Add("authorization", "Bearer ")
+	// TODO:
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Authorization", "Bearer ")
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
 
-	body, err := ioutil.ReadAll(resp.Body)
+	var devices []Device
+	err = json.
+		NewDecoder(resp.Body).
+		Decode(&devices)
+
 	if err != nil {
 		return nil, err
 	}
 
-	var devices []*Device
-
-	err = json.Unmarshal(body, &devices)
-	if err != nil {
-		return nil, err
-	}
-
-	return devices, err
+	return devices, nil
 }
