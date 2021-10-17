@@ -1,21 +1,23 @@
 package dexcomClient
 
-import (
-	"golang.org/x/oauth2"
-)
+import "fmt"
 
 type Client struct {
-	AuthCode    string
-	DexcomToken string
-	config      *Config
-	conf        oauth2.Config
-	logger
+	token   string
+	sandbox bool
 }
 
-func NewClient(config *Config) *Client {
+func (c *Client) getURL(path string) string {
+	base := baseUrl
+	if c.sandbox {
+		base = sandboxUrl
+	}
+	return fmt.Sprintf("%s%s", base, path)
+}
+
+func NewClient(token string) *Client {
 	dc := &Client{
-		config: config,
-		logger: &defaultLogger{config: config},
+		token: token,
 	}
 	return dc
 }
