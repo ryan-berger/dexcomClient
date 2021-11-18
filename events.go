@@ -2,47 +2,39 @@ package dexcomClient
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"fmt"
 	"net/http"
+
+	"github.com/ryan-berger/dexcomClient/model"
 )
 
-const eventsUrl = "v1/users/self/events"
-
-type Event struct {
-	SystemTime   string `json:"systemTime"`
-	DisplayTime  string `json:"displayTime"`
-	EventType    string `json:"eventType"`
-	EventSubType string `json:"eventSubType"`
-	Value        int    `json:"value"`
-	Unit         string `json:"unit"`
+type eventResponse struct {
+	Events []model.Event `json:"events"`
 }
 
-type EventResponse struct {
-	Events []Event `json:"events"`
-}
+func (c *Client) GetEvents(startDate, endDate string) ([]model.Event, error) {
+	path := fmt.Sprintf("/v2/users/self/egvs?startDate=%s&endDate=%s", startDate, endDate)
 
-func (client *DexcomClient) GetEvents(startDate, endDate string) ([]Event, error) {
-	req, _ := http.NewRequest("GET",
-		urlWithDateRange(client.config, eventsUrl, startDate, endDate), nil)
-
-	token, err := client.GetOauthToken()
-
+	req, err := http.NewRequest("GET", c.getURL(path), nil)
 	if err != nil {
 		return nil, err
 	}
 
-	req.Header.Add("authorization", "Bearer " + token.AccessToken)
+	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", c.token))
 	resp, err := http.DefaultClient.Do(req)
 
 	if err != nil {
 		return nil, err
 	}
 
-	body, _ := ioutil.ReadAll(resp.Body)
-	defer resp.Body.Close()
+	var response eventResponse
+	err = json.
+		NewDecoder(resp.Body).
+		Decode(&resp)
 
-	var response EventResponse
-	json.Unmarshal(body, &response)
+	if err != nil {
+		return nil, err
+	}
 
 	return response.Events, nil
 }
